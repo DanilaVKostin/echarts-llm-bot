@@ -182,3 +182,8 @@ python -m scripts.build_rag --help
 **OpenRouter не настроен** — при выборе облачной модели появится ошибка. Добавьте `OPENROUTER_API_KEY` в `.env`.
 
 **Ошибка БД** — проверьте `DATABASE_URL` и доступность сервера. Кнопка **Test DB Query** выводит результат в консоль браузера (F12).
+
+## Визуальное представление "как работает проект"
+
+<img width="2013" height="799" alt="image" src="https://github.com/user-attachments/assets/47873f34-f3b4-42b6-874a-32610dcd518e" />
+
