@@ -1,0 +1,51 @@
+{
+  "_description": "Minimal valid ECharts line chart with two series. Demonstrates smooth curves, area fill, and a shared xAxis.",
+  "title": {
+    "text": "Revenue vs Expenses",
+    "subtext": "Jan–Jun 2024",
+    "left": "center"
+  },
+  "tooltip": {
+    "trigger": "axis"
+  },
+  "legend": {
+    "data": ["Revenue", "Expenses"],
+    "bottom": 0
+  },
+  "grid": {
+    "left": "5%",
+    "right": "5%",
+    "bottom": "12%",
+    "containLabel": true
+  },
+  "xAxis": {
+    "type": "category",
+    "boundaryGap": false,
+    "data": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"]
+  },
+  "yAxis": {
+    "type": "value",
+    "name": "USD (k)"
+  },
+  "series": [
+    {
+      "name": "Revenue",
+      "type": "line",
+      "smooth": true,
+      "data": [95, 140, 160, 130, 180, 210],
+      "areaStyle": { "opacity": 0.15 },
+      "symbol": "circle",
+      "symbolSize": 7
+    },
+    {
+      "name": "Expenses",
+      "type": "line",
+      "smooth": true,
+      "data": [80, 100, 120, 110, 140, 160],
+      "areaStyle": { "opacity": 0.1 },
+      "lineStyle": { "type": "dashed" },
+      "symbol": "circle",
+      "symbolSize": 7
+    }
+  ]
+}

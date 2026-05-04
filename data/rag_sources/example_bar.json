@@ -1,0 +1,40 @@
+{
+  "_description": "Minimal valid ECharts bar chart option. Categories on xAxis, numeric values on yAxis.",
+  "title": {
+    "text": "Monthly Sales",
+    "left": "center"
+  },
+  "tooltip": {
+    "trigger": "axis",
+    "axisPointer": { "type": "shadow" }
+  },
+  "legend": {
+    "data": ["Sales"],
+    "bottom": 0
+  },
+  "grid": {
+    "left": "5%",
+    "right": "5%",
+    "bottom": "12%",
+    "containLabel": true
+  },
+  "xAxis": {
+    "type": "category",
+    "data": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+    "axisLabel": { "rotate": 0 }
+  },
+  "yAxis": {
+    "type": "value",
+    "name": "Units"
+  },
+  "series": [
+    {
+      "name": "Sales",
+      "type": "bar",
+      "data": [120, 200, 150, 80, 70, 110],
+      "barWidth": "50%",
+      "itemStyle": { "borderRadius": [4, 4, 0, 0] },
+      "label": { "show": false }
+    }
+  ]
+}

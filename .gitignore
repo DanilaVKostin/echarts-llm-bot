@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+.env
+
+# Logs
+logs/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Misc
+.DS_Store
+*.log
+
+# Data / embeddings (large binary files, generated locally)
+backend/data/chroma_db/
+backend/data/embeddings/
+
+# Claude Code local settings
+.claude/settings.local.json
