@@ -165,22 +165,6 @@ cd backend
 python -m scripts.build_rag
 ```
 
-Дополнительные опции:
-
-```bash
-python -m scripts.build_rag --help
-```
-
----
-
-## Возможные проблемы
-
-**RAG выкл** (красный индикатор в шапке) — индекс не собран. Выполните `python -m scripts.build_rag`.
-
-**OpenRouter не настроен** — при выборе облачной модели появится ошибка. Добавьте `OPENROUTER_API_KEY` в `.env`.
-
-**Ошибка БД** — проверьте `DATABASE_URL` и доступность сервера. Кнопка **Test DB Query** выводит результат в консоль браузера (F12).
-
 ## Визуальное представление "как работает проект"
 
 <img width="2070" height="789" alt="image" src="https://github.com/user-attachments/assets/01550ac5-db5d-472e-a147-164a1c3d57d9" />
