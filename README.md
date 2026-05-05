@@ -183,5 +183,5 @@ python -m scripts.build_rag --help
 
 ## Визуальное представление "как работает проект"
 
-<img width="2013" height="799" alt="image" src="https://github.com/user-attachments/assets/47873f34-f3b4-42b6-874a-32610dcd518e" />
+<img width="2070" height="789" alt="image" src="https://github.com/user-attachments/assets/01550ac5-db5d-472e-a147-164a1c3d57d9" />
 
