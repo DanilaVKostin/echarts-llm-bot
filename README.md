@@ -105,7 +105,7 @@ npm run dev
 | -------- | -------------------------- |
 | Фронтенд | http://localhost:5173      |
 | Бэкенд   | http://localhost:8000      |
-| API docs | http://localhost:8000/docs |
+
 
 ---
 
