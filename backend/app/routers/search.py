@@ -46,6 +46,7 @@ async def indicator_search_status() -> dict:
     "/search-indicators/smart",
     responses={
         400: {"description": "OpenRouter API key not configured"},
+        422: {"description": "Query is not related to RZD data"},
         502: {"description": "LLM entity extraction failed"},
     },
 )
@@ -71,6 +72,12 @@ async def smart_search_indicators(body: SmartSearchRequest) -> SmartSearchRespon
         key: [str(t) for t in extracted.get(key, []) if t]
         for key in _TABLE_KEYS
     }
+
+    if not any(terms_by_table.values()):
+        raise HTTPException(
+            status_code=422,
+            detail="Запрос не относится к данным РЖД — не удалось извлечь ни одного индикатора, организации или параметра.",
+        )
 
     results = await indicator_search_service.search_by_terms(terms_by_table, body.top_k)
     return SmartSearchResponse(results=results, extracted_terms=terms_by_table)
