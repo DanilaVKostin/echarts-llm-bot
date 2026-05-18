@@ -23,7 +23,6 @@ function apiBase(): string {
 
 const API_URL = `${apiBase()}/api/chart`;
 const RAG_STATUS_URL = `${apiBase()}/api/rag/status`;
-const DB_TEST_URL = `${apiBase()}/api/db/test-query`;
 
 const LLM_MODEL_STORAGE_KEY = "echarts_llm_model";
 
@@ -66,17 +65,6 @@ interface RagStatus {
 }
 
 type Status = "idle" | "loading" | "success" | "error";
-
-async function runDbTestQuery() {
-  console.log("Fetching DB test query…");
-  try {
-    const res = await fetch(DB_TEST_URL);
-    const data = await res.json();
-    console.log("DB test query result:", data);
-  } catch (err) {
-    console.error("DB test query error:", err);
-  }
-}
 
 // ── App ───────────────────────────────────────────────────────────────────────
 
@@ -306,14 +294,6 @@ export default function App() {
           onClick={() => setPage("search")}
         >
           🔍 Поиск индикаторов
-        </button>
-
-        <button
-          type="button"
-          onClick={runDbTestQuery}
-          className={styles.clearBtn}
-        >
-          Test DB Query
         </button>
 
         <div className={styles.headerRight}>

@@ -66,7 +66,7 @@ cd frontend
 npm install
 ```
 
-### 4. Модели Ollama (для локального режима) - обновить под актуальные модели для вашей системы.
+### 4. Модели Ollama (для локального режима)
 
 ```bash
 ollama pull qwen2.5:7b        # основная LLM
@@ -92,7 +92,11 @@ python -m scripts.build_rag
 **Терминал 1 — бэкенд** (из `backend/`, venv активирован):
 
 ```bash
-uvicorn app.main:app --reload
+# Windows (Git Bash)
+./runbackend.sh
+
+# Linux / macOS
+uvicorn app.main:app --reload --port 9000
 ```
 
 **Терминал 2 — фронтенд** (из `frontend/`):
@@ -101,11 +105,10 @@ uvicorn app.main:app --reload
 npm run dev
 ```
 
-| Сервис   | URL                        |
-| -------- | -------------------------- |
-| Фронтенд | http://localhost:5173      |
-| Бэкенд   | http://localhost:8000      |
-
+| Сервис   | URL                       |
+| -------- | ------------------------- |
+| Фронтенд | http://localhost:3000     |
+| Бэкенд   | http://localhost:9000     |
 
 ---
 
@@ -113,13 +116,16 @@ npm run dev
 
 В интерфейсе можно выбрать модель через выпадающее меню:
 
-| Метка в UI               | Требует              |
-| ------------------------ | -------------------- |
-| Local · qwen2.5          | Ollama               |
-| Local · qwen3.5 9B       | Ollama               |
-| Local · qwen3-coder 30B  | Ollama               |
-| OpenRouter · qwen3.6-27b | `OPENROUTER_API_KEY` |
-| OpenRouter · GPT-4o      | `OPENROUTER_API_KEY` |
+| Метка в UI                        | Требует              |
+| --------------------------------- | -------------------- |
+| Local · qwen2.5                   | Ollama               |
+| Local · qwen3.5 9B                | Ollama               |
+| Local · qwen3-coder 30B           | Ollama               |
+| OpenRouter · qwen3.6-27b          | `OPENROUTER_API_KEY` |
+| OpenRouter · GPT-4o               | `OPENROUTER_API_KEY` |
+| OpenRouter · Gemini 2.5 Flash     | `OPENROUTER_API_KEY` |
+| OpenRouter · Gemini 2.5 Flash Lite| `OPENROUTER_API_KEY` |
+| OpenRouter · DeepSeek V3.2        | `OPENROUTER_API_KEY` |
 
 ---
 
@@ -143,7 +149,7 @@ echarts-llm-bot/
 │   │   ├── services/            # LLM, БД, RAG, эмбеддинги
 │   │   └── prompts/             # Системные промпты
 │   ├── scripts/
-│   │   └── build_rag.py         # Сборка ChromaDB индекса
+│   │   └── build_rag.py         # Сборка ChromaDB индекса для ECharts RAG
 │   └── requirements.txt
 ├── frontend/
 │   └── src/
@@ -168,4 +174,3 @@ python -m scripts.build_rag
 ## Визуальное представление "как работает проект"
 
 <img width="2070" height="789" alt="image" src="https://github.com/user-attachments/assets/01550ac5-db5d-472e-a147-164a1c3d57d9" />
-
