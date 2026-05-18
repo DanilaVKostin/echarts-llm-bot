@@ -1,4 +1,11 @@
-import { useState, FormEvent, useRef, useEffect, ChangeEvent, useMemo } from "react";
+import {
+  useState,
+  FormEvent,
+  useRef,
+  useEffect,
+  ChangeEvent,
+  useMemo,
+} from "react";
 import ReactECharts from "echarts-for-react";
 import Papa from "papaparse";
 import { reviveEchartsOption } from "./reviveEchartsOption";
@@ -26,6 +33,12 @@ const LLM_MODEL_OPTIONS = [
   { value: "local_qwen3_coder_30b", label: "Local · qwen3-coder 30B" },
   { value: "openrouter_qwen35_27b", label: "OpenRouter · qwen3.6-27b" },
   { value: "openrouter_gpt4o", label: "OpenRouter · GPT-4o" },
+  { value: "openrouter_gemini_flash", label: "OpenRouter · Gemini 2.5 Flash" },
+  {
+    value: "openrouter_gemini_flash_lite",
+    label: "OpenRouter · Gemini 2.5 Flash Lite",
+  },
+  { value: "openrouter_deepseek_v3", label: "OpenRouter · DeepSeek V3.2" },
 ] as const;
 
 type LlmModelValue = (typeof LLM_MODEL_OPTIONS)[number]["value"];
@@ -102,7 +115,13 @@ export default function App() {
     fetch(RAG_STATUS_URL)
       .then((r) => r.json())
       .then((data) => setRagStatus(data as RagStatus))
-      .catch(() => setRagStatus({ ok: false, collection_count: null, error: "Backend unreachable" }));
+      .catch(() =>
+        setRagStatus({
+          ok: false,
+          collection_count: null,
+          error: "Backend unreachable",
+        }),
+      );
   }, []);
 
   function handleLlmModelChange(e: ChangeEvent<HTMLSelectElement>) {
@@ -203,14 +222,22 @@ export default function App() {
         const body = await res.json().catch(() => ({}));
         const detail = (body as { detail?: unknown }).detail;
         if (detail && typeof detail === "object") {
-          const d = detail as { message?: string; entity_extraction?: unknown; sql_query?: string; sql_result?: unknown[] };
-          if (d.entity_extraction) console.log("1. Entity extraction:", d.entity_extraction);
-          if (d.sql_query)         console.log("2. SQL query:", d.sql_query);
+          const d = detail as {
+            message?: string;
+            entity_extraction?: unknown;
+            sql_query?: string;
+            sql_result?: unknown[];
+          };
+          if (d.entity_extraction)
+            console.log("1. Entity extraction:", d.entity_extraction);
+          if (d.sql_query) console.log("2. SQL query:", d.sql_query);
           console.log("3. SQL result:", d.sql_result ?? []);
           console.error("4. Error:", d.message ?? `HTTP ${res.status}`);
           throw new Error(d.message ?? `HTTP ${res.status}`);
         }
-        throw new Error(typeof detail === "string" ? detail : `HTTP ${res.status}`);
+        throw new Error(
+          typeof detail === "string" ? detail : `HTTP ${res.status}`,
+        );
       }
 
       const data = (await res.json()) as {
@@ -220,10 +247,11 @@ export default function App() {
         entity_extraction?: unknown;
         rag_chunks?: string[];
       };
-      if (data.entity_extraction) console.log("1. Entity extraction:", data.entity_extraction);
-      if (data.sql_query)         console.log("2. SQL query:", data.sql_query);
-      if (data.sql_result)        console.log("3. SQL result:", data.sql_result);
-      if (data.rag_chunks)        console.log("4. RAG chunks:", data.rag_chunks);
+      if (data.entity_extraction)
+        console.log("1. Entity extraction:", data.entity_extraction);
+      if (data.sql_query) console.log("2. SQL query:", data.sql_query);
+      if (data.sql_result) console.log("3. SQL result:", data.sql_result);
+      if (data.rag_chunks) console.log("4. RAG chunks:", data.rag_chunks);
       const newChart = data.chart_option;
 
       const assistantMsg: ChatMessage = {
@@ -247,7 +275,7 @@ export default function App() {
 
   const chartOptionForRender = useMemo(
     () => (activeChart !== null ? reviveEchartsOption(activeChart) : null),
-    [activeChart]
+    [activeChart],
   );
 
   const chartCopy = useMemo(
@@ -255,7 +283,7 @@ export default function App() {
       activeChart !== null
         ? getChartSourceCopy(activeChart)
         : { text: "", mode: "json" as const },
-    [activeChart]
+    [activeChart],
   );
 
   // ── Рендер ───────────────────────────────────────────────────────────────────
@@ -272,11 +300,19 @@ export default function App() {
 
         <RagIndicator status={ragStatus} />
 
-        <button type="button" className={styles.clearBtn} onClick={() => setPage("search")}>
+        <button
+          type="button"
+          className={styles.clearBtn}
+          onClick={() => setPage("search")}
+        >
           🔍 Поиск индикаторов
         </button>
 
-        <button type="button" onClick={runDbTestQuery} className={styles.clearBtn}>
+        <button
+          type="button"
+          onClick={runDbTestQuery}
+          className={styles.clearBtn}
+        >
           Test DB Query
         </button>
 
@@ -317,7 +353,11 @@ export default function App() {
       {fileError && (
         <div className={styles.fileBanner}>
           ⚠ {fileError}
-          <button type="button" className={styles.fileBannerClose} onClick={() => setFileError(null)}>
+          <button
+            type="button"
+            className={styles.fileBannerClose}
+            onClick={() => setFileError(null)}
+          >
             ✕
           </button>
         </div>
@@ -342,7 +382,9 @@ export default function App() {
                 key={msg.id}
                 className={`${styles.bubble} ${msg.role === "user" ? styles.bubbleUser : styles.bubbleAssistant}`}
               >
-                <span className={styles.bubbleRole}>{msg.role === "user" ? "You" : "Assistant"}</span>
+                <span className={styles.bubbleRole}>
+                  {msg.role === "user" ? "You" : "Assistant"}
+                </span>
                 <p className={styles.bubbleText}>{msg.content}</p>
                 {msg.role === "assistant" && msg.chartOption && (
                   <div className={styles.bubbleActions}>
@@ -354,7 +396,13 @@ export default function App() {
                       Показать график ↗
                     </button>
                     {msg.sqlQuery && (
-                      <CopyButton text={msg.sqlQuery} title="Скопировать SQL запрос" label="⎘ SQL" labelCopied="✓ Скопирован" className={styles.viewBtn} />
+                      <CopyButton
+                        text={msg.sqlQuery}
+                        title="Скопировать SQL запрос"
+                        label="⎘ SQL"
+                        labelCopied="✓ Скопирован"
+                        className={styles.viewBtn}
+                      />
                     )}
                   </div>
                 )}
@@ -486,7 +534,9 @@ export default function App() {
           {activeChart === null && !isLoading && (
             <div className={styles.centeredFill}>
               <span className={styles.placeholder}>📈</span>
-              <p className={styles.placeholderText}>Здесь появится ваш график.</p>
+              <p className={styles.placeholderText}>
+                Здесь появится ваш график.
+              </p>
             </div>
           )}
         </section>
@@ -530,7 +580,9 @@ function CopyButton({
       type="button"
       onClick={handleCopy}
       title={title}
-      className={className ?? `${styles.copyBtn} ${copied ? styles.copyBtnCopied : ""}`}
+      className={
+        className ?? `${styles.copyBtn} ${copied ? styles.copyBtnCopied : ""}`
+      }
     >
       {copied ? labelCopied : label}
     </button>
@@ -555,7 +607,11 @@ function RagIndicator({ status }: { status: RagStatus | null }) {
   const dotClass =
     styles.ragDot +
     " " +
-    (isLoading ? styles.ragDotLoading : isActive ? styles.ragDotActive : styles.ragDotOff);
+    (isLoading
+      ? styles.ragDotLoading
+      : isActive
+        ? styles.ragDotActive
+        : styles.ragDotOff);
 
   return (
     <div className={styles.ragIndicator} title={tooltip}>

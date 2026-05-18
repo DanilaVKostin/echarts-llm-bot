@@ -19,6 +19,9 @@ class LLMModelChoice(str, Enum):
     local_qwen3_coder_30b = "local_qwen3_coder_30b"
     openrouter_qwen35_27b = "openrouter_qwen35_27b"
     openrouter_gpt4o = "openrouter_gpt4o"
+    openrouter_gemini_flash = "openrouter_gemini_flash"
+    openrouter_gemini_flash_lite = "openrouter_gemini_flash_lite"
+    openrouter_deepseek_v3 = "openrouter_deepseek_v3"
 
 
 @dataclass(frozen=True)
@@ -26,25 +29,35 @@ class LLMRuntime:
     base_url: str
     api_key: str | None
     model: str
+    extra_params: dict | None = None
+
+
+_NO_THINKING = {"thinking": {"type": "disabled"}}
+
+_RUNTIME_TABLE: dict[LLMModelChoice, tuple[str, str, str, dict | None]] = {
+    # (base_url_attr, api_key_attr, model_attr, extra_params)
+    LLMModelChoice.local_qwen25:              ("LLM_LOCAL_BASE_URL", "LLM_LOCAL_API_KEY", "LLM_LOCAL_MODEL", None),
+    LLMModelChoice.local_qwen35_9b:           ("LLM_LOCAL_BASE_URL", "LLM_LOCAL_API_KEY", "LLM_LOCAL_MODEL_QWEN35_9B", None),
+    LLMModelChoice.local_qwen3_coder_30b:     ("LLM_LOCAL_BASE_URL", "LLM_LOCAL_API_KEY", "LLM_LOCAL_MODEL_QWEN3_CODER_30B", None),
+    LLMModelChoice.openrouter_qwen35_27b:     ("OPENROUTER_BASE_URL", "OPENROUTER_API_KEY", "OPENROUTER_MODEL_QWEN35_27B", None),
+    LLMModelChoice.openrouter_gpt4o:          ("OPENROUTER_BASE_URL", "OPENROUTER_API_KEY", "OPENROUTER_MODEL_GPT4O", None),
+    LLMModelChoice.openrouter_gemini_flash:   ("OPENROUTER_BASE_URL", "OPENROUTER_API_KEY", "OPENROUTER_MODEL_GEMINI_FLASH", _NO_THINKING),
+    LLMModelChoice.openrouter_gemini_flash_lite: ("OPENROUTER_BASE_URL", "OPENROUTER_API_KEY", "OPENROUTER_MODEL_GEMINI_FLASH_LITE", None),
+    LLMModelChoice.openrouter_deepseek_v3:       ("OPENROUTER_BASE_URL", "OPENROUTER_API_KEY", "OPENROUTER_MODEL_DEEPSEEK_V3", None),
+}
 
 
 def resolve_llm_runtime(choice: LLMModelChoice) -> LLMRuntime:
-    if choice is LLMModelChoice.local_qwen25:
-        key = settings.LLM_LOCAL_API_KEY.strip()
-        return LLMRuntime(settings.LLM_LOCAL_BASE_URL.rstrip("/"), key if key else None, settings.LLM_LOCAL_MODEL)
-    if choice is LLMModelChoice.local_qwen35_9b:
-        key = settings.LLM_LOCAL_API_KEY.strip()
-        return LLMRuntime(settings.LLM_LOCAL_BASE_URL.rstrip("/"), key if key else None, settings.LLM_LOCAL_MODEL_QWEN35_9B)
-    if choice is LLMModelChoice.local_qwen3_coder_30b:
-        key = settings.LLM_LOCAL_API_KEY.strip()
-        return LLMRuntime(settings.LLM_LOCAL_BASE_URL.rstrip("/"), key if key else None, settings.LLM_LOCAL_MODEL_QWEN3_CODER_30B)
-    if choice is LLMModelChoice.openrouter_qwen35_27b:
-        key = settings.OPENROUTER_API_KEY.strip()
-        return LLMRuntime(settings.OPENROUTER_BASE_URL.rstrip("/"), key if key else None, settings.OPENROUTER_MODEL_QWEN35_27B)
-    if choice is LLMModelChoice.openrouter_gpt4o:
-        key = settings.OPENROUTER_API_KEY.strip()
-        return LLMRuntime(settings.OPENROUTER_BASE_URL.rstrip("/"), key if key else None, settings.OPENROUTER_MODEL_GPT4O)
-    raise ValueError(f"Unknown LLM choice: {choice}")
+    if choice not in _RUNTIME_TABLE:
+        raise ValueError(f"Unknown LLM choice: {choice}")
+    base_attr, key_attr, model_attr, extra = _RUNTIME_TABLE[choice]
+    key = getattr(settings, key_attr).strip()
+    return LLMRuntime(
+        getattr(settings, base_attr).rstrip("/"),
+        key if key else None,
+        getattr(settings, model_attr),
+        extra_params=extra,
+    )
 
 
 def openrouter_key_configured() -> bool:
@@ -55,6 +68,9 @@ def requires_openrouter_key(choice: LLMModelChoice) -> bool:
     return choice in (
         LLMModelChoice.openrouter_qwen35_27b,
         LLMModelChoice.openrouter_gpt4o,
+        LLMModelChoice.openrouter_gemini_flash,
+        LLMModelChoice.openrouter_gemini_flash_lite,
+        LLMModelChoice.openrouter_deepseek_v3,
     )
 
 
@@ -66,6 +82,8 @@ class BaseLLMClient:
     async def call_llm(self, messages: list[dict], runtime: LLMRuntime, attempt: int = 0) -> str:
         url = f"{runtime.base_url}/chat/completions"
         payload = {"model": runtime.model, "messages": messages, "temperature": settings.LLM_TEMPERATURE}
+        if runtime.extra_params:
+            payload.update(runtime.extra_params)
 
         log.info(
             "LLM request",
@@ -111,7 +129,7 @@ class BaseLLMClient:
             raw = await self.call_llm(working_messages, runtime, attempt=attempt)
             try:
                 return self.parse_json(raw)
-            except (json.JSONDecodeError, ValueError):
+            except json.JSONDecodeError:
                 if attempt == self._max_retries:
                     log.error(
                         "LLM JSON parse failed after all retries",

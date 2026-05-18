@@ -1,1 +1,1 @@
-py -m uvicorn app.main:app --reload
+py -m uvicorn app.main:app --reload --port 9000

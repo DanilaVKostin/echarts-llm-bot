@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str = ""
     OPENROUTER_MODEL_QWEN35_27B: str = "qwen/qwen3.6-27b"
     OPENROUTER_MODEL_GPT4O: str = "openai/gpt-4o"
+    OPENROUTER_MODEL_GEMINI_FLASH: str = "google/gemini-2.5-flash"
+    OPENROUTER_MODEL_GEMINI_FLASH_LITE: str = "google/gemini-2.5-flash-lite"
+    OPENROUTER_MODEL_DEEPSEEK_V3: str = "deepseek/deepseek-v3.2"
 
     LLM_MAX_RETRIES: int = 2
     LLM_HTTP_TIMEOUT: float = 120.0
